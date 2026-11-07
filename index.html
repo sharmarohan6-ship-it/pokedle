@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pokédle All Gens</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:0;min-height:100vh;color:#1e293b;font-family:'Nunito',system-ui,Arial,sans-serif;background:linear-gradient(180deg,#1E3A8A 0%, #2A5AA8 30%, #E8EEF7 65%, #F1F5F9 100%);background-attachment:fixed}
+.topBar{background:#1e293b;color:#FFCB05;padding:9px 0;text-align:center;font-weight:900;letter-spacing:.5px;font-size:13px}
+.topBar span{color:white}
+.container{max-width:900px;margin:auto;padding:18px 16px 30px}
+.header{text-align:center;margin:6px 0 16px}
+.header h1{font-family:'Fredoka',sans-serif;font-size:46px;margin:0;line-height:1;color:white;text-shadow:0 3px 0 rgba(0,0,0,.25)}
+.header h1 span{color:#FFCB05}
+.header p{background:white;display:inline-block;padding:6px 16px;border-radius:999px;font-weight:800;margin:10px 0 0;box-shadow:0 3px 0 rgba(0,0,0,.15);font-size:14px}
+#loginCard{background:white;border-radius:20px;padding:20px;text-align:center;margin:16px 0;box-shadow:0 6px 20px rgba(0,0,0,.15)}
+#loginCard h2{margin:0 0 6px;font-family:'Fredoka',sans-serif;font-size:26px;color:#DC2626}
+#loginCard p{opacity:.7;margin:0 0 14px;font-weight:700;font-size:14px}
+.loginRow{display:flex;gap:10px}
+.loginRow input{flex:1}
+.loginRow button{flex:0 0 120px;background:#DC2626;color:white}
+.guestRow{margin-top:10px}
+#guestBtn{width:100%;background:#F1F5F9;color:#1e293b;border:2px solid #CBD5E1;padding:13px;border-radius:12px;font-weight:900;cursor:pointer;font-size:15px}
+#guestBtn small{display:block;font-weight:700;opacity:.6;font-size:12px}
+#userBar{display:none;align-items:center;justify-content:space-between;background:#1e293b;color:white;border-radius:14px;padding:12px 16px;margin:16px 0;gap:10px}
+#userBar.show{display:flex}
+#userBar b{font-size:18px}
+#userBar span{opacity:.8;font-size:13px}
+#userBar button{flex:0 0 auto;padding:9px 14px;font-size:13px;background:#FFCB05;color:#111827;border:none;border-radius:10px;font-weight:900;cursor:pointer}
+#userList{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+.userChip{background:#FEF3C7;border:2px solid #EAB308;padding:8px 14px;border-radius:999px;cursor:pointer;font-weight:900;font-size:14px}
+.userChip:hover{background:#FDE68A}
+#gameArea{display:none}
+#gameArea.show{display:block}
+.gameCard{background:white;border-radius:20px;padding:18px;box-shadow:0 6px 20px rgba(0,0,0,.12);overflow:hidden}
+/* MODE SWITCH */
+.modeSwitch{display:flex;gap:10px;margin-bottom:14px;background:#F1F5F9;padding:6px;border-radius:14px}
+.modeBtn{flex:1;padding:12px;border:none;border-radius:10px;font-weight:900;cursor:pointer;font-size:15px;font-family:'Nunito',sans-serif;background:transparent;color:#64748B}
+.modeBtn.active{background:white;color:#1e293b;box-shadow:0 3px 10px rgba(0,0,0,.12);border:2px solid #2A75BB}
+.modeBtn small{display:block;font-size:11px;font-weight:700;opacity:.7}
+#dailyInfo{display:none;background:#FFFBEB;border:2px solid #F59E0B;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-weight:800;font-size:14px;text-align:center}
+#dailyInfo.show{display:block}
+#dailyInfo b{color:#D97706}
+.searchBox{position:relative}
+input{width:100%;padding:15px 16px;border:2px solid #CBD5E1;border-radius:14px;background:#F8FAFC;color:#111827;font-size:17px;outline:none;font-weight:800;font-family:'Nunito',sans-serif}
+input:focus{border-color:#2A75BB;background:white}
+#suggestions{position:absolute;left:0;right:0;background:white;max-height:260px;overflow:auto;border-radius:12px;z-index:100;box-shadow:0 16px 30px rgba(0,0,0,.2);border:2px solid #E2E8F0;margin-top:6px}
+.suggestion{padding:12px 16px;cursor:pointer;display:flex;justify-content:space-between;font-weight:800}
+.suggestion:hover{background:#FEF3C7}
+.suggestion small{opacity:.6}
+.btnRow{display:flex;gap:10px;margin-top:12px}
+button{flex:1;padding:14px;border:none;border-radius:12px;cursor:pointer;font-weight:900;font-size:16px;font-family:'Nunito',sans-serif}
+button:active{transform:translateY(1px)}
+#guessBtn{background:#FFCB05;color:#1e293b;border:2px solid #EAB308}
+#newBtn{background:#2A75BB;color:white}
+#giveUpBtn{background:transparent;color:#DC2626;border:1px solid #FCA5A5;width:100%;margin-top:10px}
+#loading{text-align:center;margin:14px;color:white;font-weight:900;text-shadow:0 1px 0 rgba(0,0,0,.3)}
+#progressBar{height:10px;background:rgba(255,255,255,.4);border-radius:999px;overflow:hidden}
+#progressFill{height:100%;width:0%;background:#FFCB05;transition:width .2s}
+#win{font-size:23px;text-align:center;margin:16px 0;padding:18px;border-radius:16px;background:#DCFCE7;border:2px solid #22C55E;display:none;font-weight:900}
+#win.show{display:block}
+#tracker{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0 0}
+.card{background:#EFF6FF;border:1px solid #BFDBFE;padding:12px 16px;border-radius:14px;flex:1;min-width:220px}
+.card:nth-child(2){background:#FFFBEB;border-color:#FDE68A}
+.card h3{margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.7px;opacity:.7}
+.card div{font-size:18px;font-weight:900}
+.tableWrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;border:1px solid #E2E8F0;margin-top:12px}
+table{width:100%;min-width:520px;border-collapse:collapse;margin:0}
+th{background:#2A75BB;color:white;padding:10px 6px;font-size:11px;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+td{padding:10px 6px;text-align:center;background:#F8FAFC;border-top:1px solid #E2E8F0;font-weight:800;font-size:14px;white-space:nowrap}
+.correct{background:#22C55E !important;color:white}
+.wrong{background:#FECACA !important;color:#7F1D1D}
+.close{background:#FDE68A !important;color:#92400E}
+img{width:44px;height:44px}
+#typesContainer{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.typeBadge{padding:8px 14px;border-radius:999px;font-weight:900;color:white;opacity:.3;filter:grayscale(.6);font-size:13px}
+.found{opacity:1;filter:none;border:2px solid rgba(0,0,0,.25)}
+.hint{font-size:13px;font-weight:700;text-align:center;margin-top:10px;opacity:.7}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin:20px 0 10px}
+.stat{background:white;border-radius:16px;padding:14px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.08);border-top:4px solid #E2E8F0}
+.stat:nth-child(1){border-top-color:#F59E0B} .stat:nth-child(2){border-top-color:#3B82F6} .stat:nth-child(3){border-top-color:#22C55E} .stat:nth-child(4){border-top-color:#EC4899}
+.stat b{font-size:28px;display:block;line-height:1;font-family:'Fredoka',sans-serif}
+.stat span{font-size:12px;opacity:.7;text-transform:uppercase;letter-spacing:.7px;font-weight:900}
+.leaderboard{margin-top:16px;background:white;border-radius:16px;padding:14px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.leaderboard h3{margin:0 0 10px;font-family:'Fredoka',sans-serif;font-size:20px}
+.lbRow{display:flex;justify-content:space-between;padding:9px 6px;border-bottom:1px solid #F1F5F9;font-size:15px;font-weight:800}
+.lbRow:last-child{border:none}
+.lbRow.me{background:#FEF3C7;border-radius:8px}
+@media(max-width:600px){.stats{grid-template-columns:1fr 1fr}.header h1{font-size:36px}.loginRow{flex-direction:column}.loginRow button{flex:1}.gameCard{padding:12px}th{font-size:10px;padding:8px 4px}td{padding:8px 4px;font-size:12px}img{width:36px;height:36px}table{min-width:480px}}
+</style>
+</head>
+<body>
+<div class="topBar">⚡ POKÉDLE <span>- Gotta Guess 'Em All!</span></div>
+<div class="container">
+<div class="header"><h1>Poké<span>dle</span></h1><p>Guess the secret Pokémon • All Gens 1-9</p></div>
+<div id="loginCard">
+<h2>👋 Who's playing?</h2>
+<p>Pick your Trainer name - your streak saves to you</p>
+<div class="loginRow">
+<input id="usernameInput" placeholder="Enter Trainer name..." autocomplete="off">
+<button onclick="login()">Play ▶</button>
+</div>
+<div class="guestRow">
+<button id="guestBtn" onclick="loginAsGuest()">🎮 Play as Guest<small>No login needed • streak won't save to leaderboard</small></button>
+</div>
+<div id="userList"></div>
+</div>
+<div id="userBar">
+<div><b id="currentUserName">Player</b><br><span id="currentUserSub">Logged in</span></div>
+<button onclick="logout()">Switch Trainer</button>
+</div>
+<div id="gameArea">
+<div class="gameCard">
+<!-- MODE SWITCH -->
+<div class="modeSwitch">
+<button id="dailyModeBtn" class="modeBtn active" onclick="setMode('daily')">📅 Daily<small>Same for everyone</small></button>
+<button id="unlimitedModeBtn" class="modeBtn" onclick="setMode('unlimited')">♾️ Unlimited<small>Play forever</small></button>
+</div>
+<div id="dailyInfo"></div>
+<div class="searchBox">
+<input id="pokemonInput" placeholder="Start typing a Pokémon... e.g. Pikachu" autocomplete="off">
+<div id="suggestions"></div>
+</div>
+<div class="btnRow">
+<button id="guessBtn" onclick="makeGuess()" disabled>Guess</button>
+<button id="newBtn" onclick="newGame(false)">↻ New Game</button>
+</div>
+<button id="giveUpBtn" onclick="giveUp()">Give up & reveal</button>
+</div>
+<div id="loading">Loading Pokedex... 0%</div>
+<div id="progressBar"><div id="progressFill"></div></div>
+<div id="win"></div>
+<div class="gameCard" style="margin-top:12px">
+<div class="tableWrap">
+<table>
+<thead><tr><th>Sprite</th><th>Name</th><th>Gen</th><th>Type 1</th><th>Type 2</th><th>Height</th><th>Weight</th></tr></thead>
+<tbody id="history"></tbody>
+</table>
+</div>
+<div id="tracker">
+<div class="card"><h3>Generation Range</h3><div id="genRange">1 - 9</div></div>
+<div class="card"><h3>Confirmed Types</h3><div id="confirmedTypes">None</div></div>
+</div>
+<h2 style="margin-top:20px;font-family:'Fredoka',sans-serif">Types Discovered</h2>
+<div id="typesContainer"></div>
+<div class="hint">⬆️ = secret is taller / heavier • ⬇️ = shorter / lighter • Green = type is in secret • Yellow = close</div>
+</div>
+<div class="stats">
+<div class="stat"><b id="streakEl">🔥 0</b><span>Streak</span></div>
+<div class="stat"><b id="bestEl">0</b><span>Best Streak</span></div>
+<div class="stat"><b id="winsEl">0</b><span>Wins</span></div>
+<div class="stat"><b id="guessesEl">0</b><span>Guesses</span></div>
+</div>
+<div class="leaderboard" id="leaderboardCard">
+<h3>🏆 Trainer Leaderboard</h3>
+<div id="leaderboardList"></div>
+</div>
+</div>
+</div>
+<script>
+let users = JSON.parse(localStorage.getItem("pokedle_users")||'{}');
+let currentUser = localStorage.getItem("pokedle_current_user") || null;
+let isGuest = localStorage.getItem("pokedle_is_guest") === "1";
+let gameMode = localStorage.getItem("pokedle_mode") || "daily";
+function getStatsFor(user){ return users[user] || {streak:0,best:0,wins:0,totalGuesses:0, dailyStreak:0, dailyBest:0, dailyWins:0}; }
+function saveUsers(){ if(isGuest) return; localStorage.setItem("pokedle_users", JSON.stringify(users)); }
+function saveCurrent(){
+  if(isGuest){ localStorage.setItem("pokedle_is_guest","1"); localStorage.removeItem("pokedle_current_user"); }
+  else if(currentUser){ localStorage.setItem("pokedle_current_user", currentUser); localStorage.removeItem("pokedle_is_guest"); }
+  else { localStorage.removeItem("pokedle_current_user"); localStorage.removeItem("pokedle_is_guest"); }
+}
+let stats = (currentUser && !isGuest) ? getStatsFor(currentUser) : {streak:0,best:0,wins:0,totalGuesses:0,dailyStreak:0,dailyBest:0,dailyWins:0};
+if(stats.dailyStreak===undefined){ stats.dailyStreak=0; stats.dailyBest=0; stats.dailyWins=0; }
+function renderUserList(){
+  const el=document.getElementById("userList"); el.innerHTML="";
+  const names=Object.keys(users);
+  if(!names.length){ el.innerHTML=`<span style="opacity:.6;font-size:13px">No Trainers yet - be the first!</span>`; return; }
+  names.forEach(n=>{
+    const d=document.createElement("div"); d.className="userChip"; d.innerText=`${n} 🔥${users[n].streak}`;
+    d.onclick=()=>{ document.getElementById("usernameInput").value=n; login(); };
+    el.appendChild(d);
+  });
+}
+function renderLeaderboard(){
+  const el=document.getElementById("leaderboardList");
+  const sorted=Object.entries(users).sort((a,b)=> (b[1].dailyBest||0) - (a[1].dailyBest||0) || b[1].best - a[1].best || b[1].wins - a[1].wins);
+  if(!sorted.length){ el.innerHTML="No scores yet - be the first Trainer!"; return; }
+  el.innerHTML = sorted.map(([name,s],i)=>`<div class="lbRow ${name===currentUser && !isGuest?'me':''}"><span>${i+1}. ${i===0?'👑 ':''}${name} ${name===currentUser && !isGuest?'(you)':''}</span><span>📅 ${s.dailyStreak||0} &nbsp;|&nbsp; 🔥 ${s.streak} &nbsp;|&nbsp; Wins ${s.wins}</span></div>`).join("");
+}
+function updateLoginUI(){
+  const loggedIn = !!currentUser;
+  document.getElementById("loginCard").style.display = loggedIn ? "none" : "block";
+  document.getElementById("userBar").classList.toggle("show", loggedIn);
+  document.getElementById("gameArea").classList.toggle("show", loggedIn);
+  document.getElementById("leaderboardCard").style.display = isGuest ? "none" : "block";
+  if(loggedIn){
+    if(isGuest){
+      document.getElementById("currentUserName").innerText = "👤 Guest Player";
+      document.getElementById("currentUserSub").innerText = `Guest mode • ${gameMode==='daily'?'📅 Daily':'♾️ Unlimited'} • Streak ${stats.streak}`;
+    } else {
+      document.getElementById("currentUserName").innerText = "👤 Trainer " + currentUser;
+      document.getElementById("currentUserSub").innerText = `${gameMode==='daily'?'📅 Daily Streak '+(stats.dailyStreak||0):'🔥 Streak '+stats.streak} • Best ${gameMode==='daily'?(stats.dailyBest||0):stats.best} • Wins ${stats.wins}`;
+    }
+  }
+  renderUserList(); renderLeaderboard();
+}
+function login(){
+  const name=document.getElementById("usernameInput").value.trim();
+  if(!name){ alert("Enter a Trainer name first!"); return; }
+  if(name.length>20){ alert("Keep name under 20 chars"); return; }
+  isGuest=false; currentUser=name;
+  if(!users[currentUser]) users[currentUser]={streak:0,best:0,wins:0,totalGuesses:0,dailyStreak:0,dailyBest:0,dailyWins:0,dailyLastPlayed:"",dailyLastDate:""};
+  stats = users[currentUser];
+  if(stats.dailyStreak===undefined){ stats.dailyStreak=0; stats.dailyBest=0; stats.dailyWins=0; }
+  saveUsers(); saveCurrent(); updateLoginUI(); updateStatsUI();
+  document.getElementById("usernameInput").value="";
+  startGameForMode(true);
+}
+function loginAsGuest(){
+  isGuest=true; currentUser="Guest";
+  stats={streak:0,best:0,wins:0,totalGuesses:0,dailyStreak:0,dailyBest:0,dailyWins:0};
+  saveCurrent(); updateLoginUI(); updateStatsUI();
+  startGameForMode(true);
+}
+function logout(){ currentUser=null; isGuest=false; stats={streak:0,best:0,wins:0,totalGuesses:0,dailyStreak:0,dailyBest:0,dailyWins:0}; saveCurrent(); updateLoginUI(); document.getElementById("usernameInput").focus(); }
+document.getElementById("usernameInput").addEventListener("keydown",e=>{ if(e.key==="Enter") login(); });
+// --- MODES + DAILY ---
+function getTodayKey(){
+  const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function getCountdown(){
+  const now=new Date(); const midnight=new Date(now); midnight.setHours(24,0,0,0);
+  const diff=midnight-now; const h=Math.floor(diff/3600000), m=Math.floor((diff%3600000)/60000);
+  return `${h}h ${m}m`;
+}
+function hashSeed(str){
+  let h=2166136261; for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619); }
+  return Math.abs(h);
+}
+function getDailyIndex(){
+  if(!pokemonData.length) return 0;
+  return hashSeed("pokedle-daily-"+getTodayKey()) % pokemonData.length;
+}
+function getDailySaveKey(){ return `pokedle_daily_${currentUser||"Guest"}_${getTodayKey()}`; }
+function loadDailyProgress(){
+  try{ return JSON.parse(localStorage.getItem(getDailySaveKey())||"null"); }catch(e){ return null; }
+}
+function saveDailyProgress(data){ localStorage.setItem(getDailySaveKey(), JSON.stringify(data)); }
+function setMode(mode){
+  gameMode=mode; localStorage.setItem("pokedle_mode", mode);
+  document.getElementById("dailyModeBtn").classList.toggle("active", mode==="daily");
+  document.getElementById("unlimitedModeBtn").classList.toggle("active", mode==="unlimited");
+  startGameForMode(true);
+}
+function updateModeUI(){
+  document.getElementById("dailyModeBtn").classList.toggle("active", gameMode==="daily");
+  document.getElementById("unlimitedModeBtn").classList.toggle("active", gameMode==="unlimited");
+  const info=document.getElementById("dailyInfo");
+  if(gameMode==="daily"){
+    info.classList.add("show");
+    const today=getTodayKey();
+    const dailyDone = !isGuest && stats.dailyLastDate===today;
+    info.innerHTML = dailyDone
+      ? `📅 Daily done for today! You already played ${today}. Come back in <b>${getCountdown()}</b> for a new one, or switch to Unlimited.`
+      : `📅 <b>Daily - ${today}</b> &nbsp;|&nbsp; Same Pokémon for everyone today &nbsp;|&nbsp; Next in <b>${getCountdown()}</b> &nbsp;|&nbsp; Daily Streak: <b>${stats.dailyStreak||0}</b>`;
+    document.getElementById("newBtn").innerText = "↻ New Game";
+    if(dailyDone) document.getElementById("newBtn").innerText = "♾️ Play Unlimited Instead";
+  } else {
+    info.classList.remove("show");
+    document.getElementById("newBtn").innerText = "↻ New Game";
+  }
+  updateStatsUI();
+}
+function startGameForMode(fromSwitch){
+  if(!pokemonData.length) { updateModeUI(); return; }
+  // If switching modes, reset board
+  guessesThisGame=0; hasWon=false; confirmedTypes.clear(); guessedTypes.clear();
+  document.getElementById("history").innerHTML="";
+  document.getElementById("genRange").innerHTML="1 - 9";
+  document.getElementById("confirmedTypes").innerHTML="None";
+  document.getElementById("win").classList.remove("show");
+  document.getElementById("pokemonInput").value="";
+  minGen=1; maxGen=9;
+  if(gameMode==="daily"){
+    const idx=getDailyIndex();
+    secretPokemon=pokemonData[idx];
+    // Restore daily progress if exists
+    const saved=loadDailyProgress();
+    if(saved && saved.pokemonId===secretPokemon.id){
+      // rebuild guesses
+      saved.guesses.forEach(gName=>{
+        const g=pokemonData.find(p=>p.name===gName);
+        if(g) replayGuess(g, true);
+      });
+      if(saved.finished){
+        hasWon=true;
+        const w=document.getElementById("win");
+        if(saved.won){
+          w.innerHTML=`🎉 Daily complete! You caught <b>${secretPokemon.name}</b> in ${saved.guesses.length} guesses!<br>Come back in <b>${getCountdown()}</b> for tomorrow's Pokémon.<br><br><button onclick="setMode('unlimited')" style="background:#2A75BB;color:white;padding:12px 24px;border:none;border-radius:12px;font-weight:900;cursor:pointer;font-size:16px">♾️ Play Unlimited While You Wait</button>`;
+          w.style.background="#DCFCE7"; w.style.borderColor="#22C55E";
+        } else {
+          w.innerHTML=`😢 Daily over - it was <b>${secretPokemon.name}</b>!<br>Come back in <b>${getCountdown()}</b> for tomorrow.<br><br><button onclick="setMode('unlimited')" style="background:#2A75BB;color:white;padding:12px 24px;border:none;border-radius:12px;font-weight:900;cursor:pointer;font-size:16px">♾️ Play Unlimited</button>`;
+          w.style.background="#FEE2E2"; w.style.borderColor="#EF4444";
+        }
+        w.classList.add("show");
+      }
+      guessesThisGame = saved.guesses.length;
+    }
+    renderTypes();
+  } else {
+    pickSecretRandom();
+    renderTypes();
+  }
+  updateModeUI();
+}
+function pickSecretRandom(){ if(!pokemonData.length) return; secretPokemon=pokemonData[Math.floor(Math.random()*pokemonData.length)]; }
+// --- GAME ---
+let pokemonData=[], secretPokemon=null, minGen=1, maxGen=9, guessesThisGame=0, hasWon=false;
+const confirmedTypes=new Set(), guessedTypes=new Set();
+function saveStats(){ if(isGuest) { updateStatsUI(); return; } if(!currentUser) return; users[currentUser]=stats; saveUsers(); updateStatsUI(); renderLeaderboard(); updateLoginUI(); }
+function updateStatsUI(){
+  if(gameMode==="daily"){
+    document.getElementById("streakEl").innerText = `📅 ${stats.dailyStreak||0}`;
+    document.getElementById("bestEl").innerText = stats.dailyBest||0;
+    document.getElementById("winsEl").innerText = stats.dailyWins||0;
+  } else {
+    document.getElementById("streakEl").innerText = `🔥 ${stats.streak}`;
+    document.getElementById("bestEl").innerText = stats.best;
+    document.getElementById("winsEl").innerText = stats.wins;
+  }
+  document.getElementById("guessesEl").innerText = guessesThisGame;
+  if(currentUser){
+    if(isGuest) document.getElementById("currentUserSub").innerText = `Guest mode • ${gameMode==='daily'?'📅 Daily':'♾️ Unlimited'} • Streak ${gameMode==='daily'?(stats.dailyStreak||0):stats.streak}`;
+    else document.getElementById("currentUserSub").innerText = `${gameMode==='daily'?'📅 Daily Streak '+(stats.dailyStreak||0):'🔥 Streak '+stats.streak} • Best ${gameMode==='daily'?(stats.dailyBest||0):stats.best} • Wins ${stats.wins}`;
+  }
+}
+const allTypes=["Normal","Fire","Water","Electric","Grass","Ice","Fighting","Poison","Ground","Flying","Psychic","Bug","Rock","Ghost","Dragon","Dark","Steel","Fairy"];
+const typeColours={Normal:"#A8A878",Fire:"#F08030",Water:"#6890F0",Electric:"#F8D030",Grass:"#78C850",Ice:"#98D8D8",Fighting:"#C03028",Poison:"#A040A0",Ground:"#E0C068",Flying:"#A890F0",Psychic:"#F85888",Bug:"#A8B820",Rock:"#B8A038",Ghost:"#705898",Dragon:"#7038F8",Dark:"#705848",Steel:"#B8B8D0",Fairy:"#EE99AC"};
+function getGeneration(id){ if(id<=151)return 1; if(id<=251)return 2; if(id<=386)return 3; if(id<=493)return 4; if(id<=649)return 5; if(id<=721)return 6; if(id<=809)return 7; if(id<=905)return 8; return 9; }
+function renderTypes(){
+  const c=document.getElementById("typesContainer"); c.innerHTML="";
+  allTypes.forEach(t=>{ const d=document.createElement("div"); d.className=guessedTypes.has(t.toLowerCase())?"typeBadge found":"typeBadge"; d.innerText=t; d.style.background=typeColours[t]; c.appendChild(d); });
+}
+async function loadPokemon(){
+  const loadingEl=document.getElementById("loading"), fill=document.getElementById("progressFill"), btn=document.getElementById("guessBtn");
+  const cached=localStorage.getItem("pokedle_cache_v1");
+  if(cached){ try{ pokemonData=JSON.parse(cached); startGameForMode(true); loadingEl.innerText=`Loaded ${pokemonData.length} Pokemon!`; fill.style.width="100%"; btn.disabled=false; setTimeout(()=>{loadingEl.style.display="none";document.getElementById("progressBar").style.display="none";},600); return; }catch(e){ localStorage.removeItem("pokedle_cache_v1"); } }
+  try{
+    const listRes=await fetch(`https://pokeapi.co/api/v2/pokemon?limit=1025`);
+    const listData=await listRes.json(); const urls=listData.results.map(p=>p.url);
+    pokemonData=[]; const BATCH=100;
+    for(let i=0;i<urls.length;i+=BATCH){
+      const batch=urls.slice(i,i+BATCH);
+      const results=await Promise.all(batch.map(url=>fetch(url).then(r=>r.json()).catch(()=>null)));
+      results.forEach(data=>{ if(!data)return; pokemonData.push({id:data.id,generation:getGeneration(data.id),name:data.name.charAt(0).toUpperCase()+data.name.slice(1),sprite:data.sprites.front_default,type1:data.types[0].type.name,type2:data.types[1]?data.types[1].type.name:"",height:data.height/10,weight:data.weight/10}); });
+      const pct=Math.round((Math.min(i+BATCH,urls.length)/urls.length)*100);
+      loadingEl.innerText=`Loading Pokedex... ${pct}% (${pokemonData.length}/1025)`; fill.style.width=pct+"%";
+    }
+    pokemonData.sort((a,b)=>a.id-b.id);
+    try{ localStorage.setItem("pokedle_cache_v1", JSON.stringify(pokemonData)); }catch(e){}
+    startGameForMode(true); loadingEl.style.display="none"; document.getElementById("progressBar").style.display="none"; btn.disabled=false;
+  }catch(e){ loadingEl.innerText="Failed to load - check internet and refresh"; }
+}
+function newGame(fromWin){
+  if(gameMode==="daily"){
+    const today=getTodayKey();
+    if(!isGuest && stats.dailyLastDate===today && !fromWin){
+      setMode('unlimited'); return;
+    }
+    if(!fromWin && !hasWon && guessesThisGame>0){
+      // In daily, New Game just resets to same daily (don't lose daily streak unless give up)
+      if(confirm("Restart today's Daily? This will clear your guesses for today.")){
+        localStorage.removeItem(getDailySaveKey());
+        startGameForMode(true);
+      }
+      return;
+    }
+    if(fromWin){ startGameForMode(true); return; }
+    startGameForMode(true); return;
+  }
+  // Unlimited
+  if(!fromWin && !hasWon && guessesThisGame>0){ stats.streak=0; saveStats(); }
+  minGen=1; maxGen=9; guessesThisGame=0; hasWon=false;
+  confirmedTypes.clear(); guessedTypes.clear();
+  document.getElementById("history").innerHTML="";
+  document.getElementById("genRange").innerHTML="1 - 9";
+  document.getElementById("confirmedTypes").innerHTML="None";
+  document.getElementById("win").classList.remove("show");
+  document.getElementById("pokemonInput").value="";
+  pickSecretRandom(); renderTypes(); updateStatsUI(); updateModeUI();
+}
+function giveUp(){
+  if(!secretPokemon || hasWon) return;
+  const w=document.getElementById("win");
+  if(gameMode==="daily"){
+    w.innerHTML=`😢 Daily over - it was <b>${secretPokemon.name}</b>! Gen ${secretPokemon.generation} • ${secretPokemon.type1}${secretPokemon.type2?"/"+secretPokemon.type2:""}<br>Daily streak reset.<br><br><button onclick="setMode('unlimited')" style="background:#2A75BB;color:white;padding:10px 20px;border:none;border-radius:10px;font-weight:900;cursor:pointer">♾️ Play Unlimited</button>`;
+    w.classList.add("show"); w.style.background="#FEE2E2"; w.style.borderColor="#EF4444";
+    if(!isGuest){
+      stats.dailyStreak=0; stats.dailyLastDate=getTodayKey(); saveStats();
+      saveDailyProgress({pokemonId:secretPokemon.id, guesses: [...document.querySelectorAll("#history tr")].map(()=> "").filter(Boolean), finished:true, won:false});
+      // save actual guesses list from history rebuild - use stored guesses
+      const saved=loadDailyProgress(); // keep finished flag
+      saveDailyProgress({pokemonId:secretPokemon.id, guesses: dailyGuesses, finished:true, won:false});
+    } else {
+      saveDailyProgress({pokemonId:secretPokemon.id, guesses: dailyGuesses, finished:true, won:false});
+    }
+    hasWon=true; updateModeUI(); return;
+  }
+  w.innerHTML=`😢 It was <b>${secretPokemon.name}</b>! Gen ${secretPokemon.generation} • ${secretPokemon.type1}${secretPokemon.type2?"/"+secretPokemon.type2:""}<br><br><button onclick="newGame(true)" style="background:#FFCB05;color:#111827;padding:10px 20px;border:none;border-radius:10px;font-weight:900;cursor:pointer">Play Again</button>`;
+  w.classList.add("show"); w.style.background="#FEE2E2"; w.style.borderColor="#EF4444";
+  stats.streak=0; saveStats(); hasWon=true;
+}
+let dailyGuesses=[];
+loadPokemon(); renderTypes(); updateLoginUI(); updateStatsUI(); updateModeUI();
+const input=document.getElementById("pokemonInput"), suggestions=document.getElementById("suggestions");
+input.addEventListener("input",()=>{
+  const v=input.value.toLowerCase(); suggestions.innerHTML=""; if(!v)return;
+  pokemonData.filter(p=>p.name.toLowerCase().includes(v)).slice(0,15).forEach(p=>{
+    const d=document.createElement("div"); d.className="suggestion"; d.innerHTML=`<span>${p.name}</span><small>Gen ${p.generation} • ${p.type1}</small>`;
+    d.onclick=()=>{ input.value=p.name; suggestions.innerHTML=""; }; suggestions.appendChild(d);
+  });
+});
+input.addEventListener("keydown",e=>{ if(e.key==="Enter") makeGuess(); });
+document.addEventListener("click",e=>{ if(!e.target.closest(".searchBox")) suggestions.innerHTML=""; });
+function compareType(guessedType, secret){
+  if(!guessedType) return "wrong";
+  const g = guessedType.toLowerCase();
+  const s1 = (secret.type1||"").toLowerCase();
+  const s2 = (secret.type2||"").toLowerCase();
+  if(g===s1 || (s2 && g===s2)) return "correct";
+  return "wrong";
+}
+function compareNumber(g,t){ if(g===t)return{text:"✅",class:"correct"}; if(g<t)return{text:"⬆️",class:"close"}; return{text:"⬇️",class:"close"}; }
+function replayGuess(guess, isReplay){
+  guessedTypes.add(guess.type1.toLowerCase()); if(guess.type2) guessedTypes.add(guess.type2.toLowerCase());
+  if(guess.generation<secretPokemon.generation) minGen=Math.max(minGen,guess.generation+1);
+  if(guess.generation>secretPokemon.generation) maxGen=Math.min(maxGen,guess.generation-1);
+  document.getElementById("genRange").innerHTML=`${minGen} - ${maxGen}`;
+  if(guess.type1===secretPokemon.type1||guess.type1===secretPokemon.type2) confirmedTypes.add(guess.type1);
+  if(guess.type2&&(guess.type2===secretPokemon.type1||guess.type2===secretPokemon.type2)) confirmedTypes.add(guess.type2);
+  document.getElementById("confirmedTypes").innerHTML=confirmedTypes.size?[...confirmedTypes].join(", "):"None";
+  renderTypes();
+  const h=compareNumber(guess.height,secretPokemon.height), w=compareNumber(guess.weight,secretPokemon.weight);
+  const row=document.createElement("tr");
+  row.innerHTML=`<td><img src="${guess.sprite}"></td><td class="${guess.name===secretPokemon.name?"correct":"wrong"}">${guess.name}</td><td class="${guess.generation===secretPokemon.generation?"correct":"wrong"}">${guess.generation}</td><td class="${compareType(guess.type1,secretPokemon)}">${guess.type1}</td><td class="${guess.type2 ? compareType(guess.type2,secretPokemon) : "wrong"}">${guess.type2||"-"}</td><td class="${h.class}">${guess.height}m ${h.text}</td><td class="${w.class}">${guess.weight}kg ${w.text}</td>`;
+  if(isReplay) document.getElementById("history").appendChild(row); else document.getElementById("history").prepend(row);
+  if(!isReplay) dailyGuesses.push(guess.name);
+}
+function makeGuess(){
+  const guessName=input.value.trim();
+  const guess=pokemonData.find(p=>p.name.toLowerCase()===guessName.toLowerCase());
+  if(!guess){ alert("Pokémon not found"); return; }
+  if(hasWon){ alert("You already finished! Switch to Unlimited or come back tomorrow for Daily."); return; }
+  if(gameMode==="daily" && !isGuest && stats.dailyLastDate===getTodayKey()){ alert("Daily already done for today! Play Unlimited."); return; }
+  guessesThisGame++; stats.totalGuesses++;
+  replayGuess(guess, false);
+  if(gameMode==="daily"){
+    saveDailyProgress({pokemonId:secretPokemon.id, guesses: dailyGuesses, finished:false, won:false});
+  }
+  if(guess.name===secretPokemon.name){
+    hasWon=true;
+    if(gameMode==="daily"){
+      if(!isGuest){
+        // Daily streak logic: if last played was yesterday, +1, else start at 1. If gap, reset to 1.
+        const yesterday=new Date(); yesterday.setDate(yesterday.getDate()-1);
+        const yKey=`${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
+        const prevDate = stats.dailyLastDate;
+        if(prevDate===yKey) stats.dailyStreak=(stats.dailyStreak||0)+1;
+        else if(prevDate===getTodayKey()) { /* already counted */ }
+        else stats.dailyStreak=1;
+        if(stats.dailyStreak>(stats.dailyBest||0)) stats.dailyBest=stats.dailyStreak;
+        stats.dailyWins=(stats.dailyWins||0)+1; stats.dailyLastDate=getTodayKey();
+        saveDailyProgress({pokemonId:secretPokemon.id, guesses: dailyGuesses, finished:true, won:true});
+      } else {
+        stats.dailyStreak=(stats.dailyStreak||0)+1; if(stats.dailyStreak>(stats.dailyBest||0)) stats.dailyBest=stats.dailyStreak;
+        saveDailyProgress({pokemonId:secretPokemon.id, guesses: dailyGuesses, finished:true, won:true});
+      }
+      stats.wins++; saveStats();
+      const winEl=document.getElementById("win");
+      winEl.innerHTML=`🎉 Daily complete! <b>${currentUser}</b> caught <b>${secretPokemon.name}</b> in ${guessesThisGame} guesses!<br>Gen ${secretPokemon.generation} • ${secretPokemon.type1}${secretPokemon.type2?"/"+secretPokemon.type2:""}<br><span style="font-size:16px">📅 Daily Streak: ${stats.dailyStreak} &nbsp;|&nbsp; Best: ${stats.dailyBest}</span><br>Next Daily in <b>${getCountdown()}</b><br><br><button onclick="setMode('unlimited')" style="background:#2A75BB;color:white;padding:12px 24px;border:none;border-radius:12px;font-weight:900;cursor:pointer;font-size:16px">♾️ Play Unlimited While You Wait</button>`;
+      winEl.classList.add("show"); winEl.style.background="#DCFCE7"; winEl.style.borderColor="#22C55E";
+      updateModeUI();
+    } else {
+      stats.streak++; stats.wins++; if(stats.streak>stats.best) stats.best=stats.streak;
+      saveStats();
+      const winEl=document.getElementById("win");
+      winEl.innerHTML=`🎉 ${currentUser} caught <b>${secretPokemon.name}</b> in ${guessesThisGame} guesses!<br>Gen ${secretPokemon.generation} • ${secretPokemon.type1}${secretPokemon.type2?"/"+secretPokemon.type2:""}${isGuest?'<br><span style="font-size:14px;opacity:.7">Guest mode - log in as a Trainer to save your streak!</span>':''}<br><span style="font-size:16px">🔥 Streak: ${stats.streak} &nbsp;|&nbsp; Best: ${stats.best}</span><br><br><button onclick="newGame(true)" style="background:#FFCB05;color:#111827;padding:12px 24px;border:none;border-radius:12px;font-weight:900;cursor:pointer;font-size:16px">▶ Play Again - Keep Streak</button>`;
+      winEl.classList.add("show"); winEl.style.background="#DCFCE7"; winEl.style.borderColor="#22C55E";
+    }
+  } else { updateStatsUI(); }
+  input.value=""; suggestions.innerHTML="";
+}
+</script>
+</body>
+</html>
